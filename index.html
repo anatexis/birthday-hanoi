@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geburtstagseinladung – Tower of Hanoi</title>
+<style>
+:root{
+  --peg-width:120px;
+  --peg-height:250px;
+  --disk-height:30px;
+  --bg:#fefae0;
+  --peg-color:#dda15e;
+  --disk1:#283618;
+  --disk2:#606c38;
+  --disk3:#bc6c25;
+  --disk4:#ccd5ae;
+}
+body{font-family:Helvetica,Arial,sans-serif;background:var(--bg);margin:0;padding:2rem;text-align:center;color:#333;}
+h1{margin-bottom:1rem;}
+#board{display:flex;justify-content:space-around;max-width:800px;margin:0 auto;}
+.peg{position:relative;width:var(--peg-width);height:var(--peg-height);border:3px solid var(--peg-color);border-radius:10px;display:flex;flex-direction:column-reverse;align-items:center;gap:2px;padding:4px;cursor:pointer;user-select:none;}
+.disk{height:var(--disk-height);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;}
+.disk[data-size="1"]{width:60px;background:var(--disk1);}
+.disk[data-size="2"]{width:90px;background:var(--disk2);}
+.disk[data-size="3"]{width:120px;background:var(--disk3);}
+.disk[data-size="4"]{width:150px;background:var(--disk4);}
+#message{margin-top:1.5rem;font-size:1.2rem;min-height:1.2em;}
+.hidden{display:none;}
+.invitation{margin-top:2rem;padding:1.5rem;border-radius:12px;background:#fff;box-shadow:0 4px 8px rgba(0,0,0,0.1);}  
+</style>
+</head>
+<body>
+<h1>Löse das Turm‑von‑Hanoi‑Rätsel!</h1>
+<p>Ziehe die vier Scheiben von der linken auf die rechte Stange – nur eine Scheibe gleichzeitig, nie eine größere auf eine kleinere.</p>
+
+<div id="board">
+  <div class="peg" id="peg0"></div>
+  <div class="peg" id="peg1"></div>
+  <div class="peg" id="peg2"></div>
+</div>
+
+<div id="message"></div>
+
+<div id="invitation" class="invitation hidden">
+  <h2>🎉 Geburtstagseinladung 🎉</h2>
+  <p><strong>Wer:</strong> <span id="childName">[Name]</span></p>
+  <p><strong>Wann:</strong> <span id="date">[Datum]</span> um <span id="time">[Uhrzeit]</span></p>
+  <p><strong>Wo:</strong> <span id="location">[Ort]</span></p>
+  <p>Wir freuen uns auf dich! Bitte gib Bescheid, ob du kommen kannst.</p>
+</div>
+
+<script>
+/**********************
+ *  KONFIGURATION     *
+ *  (hier anpassen)   *
+ **********************/
+const INVITATION = {
+  childName: "Max Mustermann",   // Name des Geburtstagskinds
+  date: "20. Juli 2025",         // Datum
+  time: "15:00 Uhr",             // Uhrzeit
+  location: "Musterstraße 123, 1010 Wien" // Ort
+};
+/***************************************************/
+
+document.getElementById("childName").textContent = INVITATION.childName;
+document.getElementById("date").textContent = INVITATION.date;
+document.getElementById("time").textContent = INVITATION.time;
+document.getElementById("location").textContent = INVITATION.location;
+
+const pegs = [
+  [4,3,2,1], // Start‑Stange (4 Scheiben: 4 = groß, 1 = klein)
+  [],
+  []
+];
+
+let selectedPeg = null;
+const boardEl = document.getElementById("board");
+const msgEl = document.getElementById("message");
+
+function render(){
+  for(let i=0;i<3;i++){
+    const pegEl = document.getElementById("peg"+i);
+    pegEl.innerHTML = "";
+    pegs[i].forEach(size=>{
+      const disk = document.createElement("div");
+      disk.className = "disk";
+      disk.dataset.size = size;
+      disk.textContent = size;
+      pegEl.appendChild(disk);
+    });
+  }
+}
+function isValidMove(from,to){
+  if(pegs[from].length===0) return false;
+  if(pegs[to].length===0) return true;
+  return pegs[from][pegs[from].length-1] < pegs[to][pegs[to].length-1];
+}
+function moveDisk(from,to){
+  pegs[to].push(pegs[from].pop());
+}
+function checkWin(){
+  return pegs[2].length===4;
+}
+function handlePegClick(index){
+  if(selectedPeg===null){
+    // Stange auswählen
+    if(pegs[index].length===0){
+      setMessage("Da ist keine Scheibe.");
+      return;
+    }
+    selectedPeg = index;
+    setMessage(`Scheibe von Stange ${index+1} ausgewählt. Ziel wählen.`);
+  }else{
+    if(selectedPeg===index){
+      selectedPeg=null;
+      setMessage("Auswahl aufgehoben.");
+      return;
+    }
+    if(isValidMove(selectedPeg,index)){
+      moveDisk(selectedPeg,index);
+      render();
+      if(checkWin()){
+        document.getElementById("invitation").classList.remove("hidden");
+        setMessage("Geschafft! 🎉 Einladung freigeschaltet.");
+        boardEl.querySelectorAll(".peg").forEach(p=>p.style.cursor="default");
+      }else{
+        setMessage(`Scheibe verschoben von ${selectedPeg+1} zu ${index+1}.`);
+      }
+    }else{
+      setMessage("Ungültiger Zug.");
+    }
+    selectedPeg=null;
+  }
+}
+function setMessage(text){
+  msgEl.textContent = text;
+}
+boardEl.querySelectorAll(".peg").forEach((pegEl,idx)=>{
+  pegEl.addEventListener("click",()=>handlePegClick(idx));
+});
+render();
+</script>
+</body>
+</html>
+
