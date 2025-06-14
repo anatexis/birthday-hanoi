@@ -23,9 +23,9 @@ h1{margin-bottom:1rem;}
 .disk[data-size="1"]{width:60px;background:var(--disk1);} 
 .disk[data-size="2"]{width:90px;background:var(--disk2);} 
 .disk[data-size="3"]{width:120px;background:var(--disk3);} 
-#message{margin-top:1.5rem;font-size:1.2rem;min-height:1.2em;} 
-.hidden{display:none;} 
-video{margin-top:2rem;max-width:100%;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.15);} 
+#message{margin-top:1.5rem;font-size:1.2rem;min-height:1.2em;}
+.hidden{display:none;}
+video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.15);display:block;}
 .invitation{margin-top:2rem;padding:1.5rem;border-radius:12px;background:#fff;box-shadow:0 4px 8px rgba(0,0,0,0.1);}  
 </style>
 </head>
@@ -41,9 +41,10 @@ video{margin-top:2rem;max-width:100%;border-radius:12px;box-shadow:0 4px 8px rgb
 
 <div id="message"></div>
 
-<!-- Video erscheint direkt unter dem Turm, noch vor den Infos -->
+<!-- Video direkt unter dem Turm.  -->
 <video id="victoryVideo" class="hidden" src="oskar.mp4" playsinline controls></video>
 
+<!-- Einladungstext erscheint UNTER dem Video -->
 <div id="invitation" class="invitation hidden">
   <h2>🎉 Geburtstagseinladung 🎉</h2>
   <p><strong>Wer:</strong> <span id="childName"></span></p>
@@ -65,88 +66,62 @@ const INVITATION = {
 };
 /***************************************************/
 
-document.getElementById("childName").textContent = INVITATION.childName;
-document.getElementById("date").textContent = INVITATION.date;
-document.getElementById("time").textContent = INVITATION.time;
-document.getElementById("time_end").textContent = INVITATION.time_end;
-document.getElementById("location").textContent = INVITATION.location;
+// Textfelder befüllen
+["childName","date","time","time_end","location"].forEach(id=>{
+  document.getElementById(id).textContent = INVITATION[id];
+});
 
-// Drei Scheiben: 3 = größte, 1 = kleinste
-const pegs = [
-  [3,2,1],
-  [],
-  []
-];
-
+// Drei Scheiben (3 = groß, 1 = klein)
+const pegs = [[3,2,1],[],[]];
 let selectedPeg = null;
 const boardEl = document.getElementById("board");
-const msgEl = document.getElementById("message");
+const msgEl   = document.getElementById("message");
 const videoEl = document.getElementById("victoryVideo");
+const inviteEl= document.getElementById("invitation");
 
 function render(){
   for(let i=0;i<3;i++){
     const pegEl = document.getElementById("peg"+i);
-    pegEl.innerHTML = "";
+    pegEl.innerHTML="";
     pegs[i].forEach(size=>{
-      const disk = document.createElement("div");
-      disk.className = "disk";
-      disk.dataset.size = size;
-      disk.textContent = size;
-      pegEl.appendChild(disk);
+      const d=document.createElement("div");
+      d.className="disk";
+      d.dataset.size=size;
+      d.textContent=size;
+      pegEl.appendChild(d);
     });
   }
 }
 function isValidMove(from,to){
-  if(pegs[from].length===0) return false;
-  if(pegs[to].length===0) return true;
-  return pegs[from][pegs[from].length-1] < pegs[to][pegs[to].length-1];
+  return pegs[from].length && (!pegs[to].length || pegs[from].at(-1)<pegs[to].at(-1));
 }
-function moveDisk(from,to){
-  pegs[to].push(pegs[from].pop());
+function moveDisk(from,to){ pegs[to].push(pegs[from].pop()); }
+function checkWin(){ return pegs[2].length===3; }
+
+function victory(){
+  videoEl.classList.remove("hidden");
+  videoEl.currentTime=0;
+  videoEl.muted=false;
+  videoEl.play().catch(()=>{});
+  inviteEl.classList.remove("hidden");
+  setMessage("Geschafft! 🎉 Einladung freigeschaltet.");
+  boardEl.querySelectorAll(".peg").forEach(p=>p.style.cursor="default");
 }
-function checkWin(){
-  return pegs[2].length===3;
-}
-function handlePegClick(index){
+
+function handlePegClick(i){
   if(selectedPeg===null){
-    if(pegs[index].length===0){
-      setMessage("Da ist keine Scheibe.");
-      return;
-    }
-    selectedPeg = index;
-    setMessage(`Scheibe von Stange ${index+1} ausgewählt. Ziel wählen.`);
+    if(!pegs[i].length){ setMessage("Da ist keine Scheibe."); return; }
+    selectedPeg=i; setMessage(`Scheibe von Stange ${i+1} ausgewählt. Ziel wählen.`);
   }else{
-    if(selectedPeg===index){
-      selectedPeg=null;
-      setMessage("Auswahl aufgehoben.");
-      return;
-    }
-    if(isValidMove(selectedPeg,index)){
-      moveDisk(selectedPeg,index);
-      render();
-      if(checkWin()){
-        videoEl.classList.remove("hidden");
-        videoEl.currentTime = 0;
-        videoEl.muted = false;
-        videoEl.play().catch(()=>{});
-        document.getElementById("invitation").classList.remove("hidden");
-        setMessage("Geschafft! 🎉 Einladung freigeschaltet.");
-        boardEl.querySelectorAll(".peg").forEach(p=>p.style.cursor="default");
-      }else{
-        setMessage(`Scheibe verschoben von ${selectedPeg+1} zu ${index+1}.`);
-      }
-    }else{
-      setMessage("Ungültiger Zug.");
-    }
+    if(selectedPeg===i){ selectedPeg=null; setMessage("Auswahl aufgehoben."); return; }
+    if(isValidMove(selectedPeg,i)){ moveDisk(selectedPeg,i); render(); checkWin()?victory():setMessage(`Scheibe verschoben von ${selectedPeg+1} zu ${i+1}.`);
+    }else{ setMessage("Ungültiger Zug."); }
     selectedPeg=null;
   }
 }
-function setMessage(text){
-  msgEl.textContent = text;
-}
-boardEl.querySelectorAll(".peg").forEach((pegEl,idx)=>{
-  pegEl.addEventListener("click",()=>handlePegClick(idx));
-});
+function setMessage(t){ msgEl.textContent=t; }
+
+boardEl.querySelectorAll(".peg").forEach((p,i)=>p.addEventListener("click",()=>handlePegClick(i)));
 render();
 </script>
 </body>
