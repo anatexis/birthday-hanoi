@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OSKARS GEBURTSTAGSEINLADUNGSRÄTSEL</title>
+<title>OSKARS GEBURTSTAGSRÄTSELEINLADUNG</title>
 <style>
 :root{
   --peg-width:120px;
@@ -20,17 +20,18 @@ h1{margin-bottom:1rem;}
 #board{display:flex;justify-content:space-around;max-width:800px;margin:0 auto;}
 .peg{position:relative;width:var(--peg-width);height:var(--peg-height);border:3px solid var(--peg-color);border-radius:10px;display:flex;flex-direction:column-reverse;align-items:center;gap:2px;padding:4px;cursor:pointer;user-select:none;}
 .disk{height:var(--disk-height);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;}
-.disk[data-size="1"]{width:60px;background:var(--disk1);} 
-.disk[data-size="2"]{width:90px;background:var(--disk2);} 
-.disk[data-size="3"]{width:120px;background:var(--disk3);} 
-#message{margin-top:1.5rem;font-size:1.2rem;min-height:1.2em;} 
-.hidden{display:none;} 
+.disk[data-size="1"]{width:60px;background:var(--disk1);}
+.disk[data-size="2"]{width:90px;background:var(--disk2);}
+.disk[data-size="3"]{width:120px;background:var(--disk3);}
+#message{margin-top:1.5rem;font-size:1.2rem;min-height:1.2em;}
+.hidden{display:none;}
 .invitation{margin-top:2rem;padding:1.5rem;border-radius:12px;background:#fff;box-shadow:0 4px 8px rgba(0,0,0,0.1);}  
+video{margin-top:2rem;max-width:100%;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.15);} 
 </style>
 </head>
 <body>
-<h1>OSKARS GEBURTSTAGSEINLADUNGSRÄTSEL</h1>
-<p>Ziehe die drei Scheiben vom linken auf den rechten Pfosten – immer nur eine Scheibe und nie eine größere auf eine kleinere.</p>
+<h1>OSKARS GEBURTSTAGSRÄTSELEINLADUNG</h1>
+<p>Bewege die drei Scheiben vom linken auf den rechten Pfosten – immer nur eine Scheibe und nie eine größere auf eine kleinere.</p>
 
 <div id="board">
   <div class="peg" id="peg0"></div>
@@ -42,28 +43,32 @@ h1{margin-bottom:1rem;}
 
 <div id="invitation" class="invitation hidden">
   <h2>🎉 Geburtstagseinladung 🎉</h2>
-  <p><strong>Wer:</strong> <span id="childName">[Name]</span></p>
-  <p><strong>Wann:</strong> <span id="date">[Datum]</span> um <span id="time">[Uhrzeit]</span></p>
-  <p><strong>Wo:</strong> <span id="location">[Ort]</span></p>
+  <p><strong>Wer:</strong> <span id="childName"></span></p>
+  <p><strong>Wann:</strong> <span id="date"></span> von <span id="time"></span> bis <span id="time_end"></span></p>
+  <p><strong>Wo:</strong> <span id="location"></span></p>
   <p>Wir freuen uns auf dich! Bitte gib Bescheid, ob du kommen kannst.</p>
 </div>
+
+<!-- Video wird erst nach erfolgreichem Lösen angezeigt -->
+<video id="victoryVideo" class="hidden" src="oskar.mp4" playsinline controls></video>
 
 <script>
 /**********************
  *  KONFIGURATION     *
- *  (hier anpassen)   *
  **********************/
 const INVITATION = {
-  childName: "Oskar",           // Name des Geburtstagskinds
-  date: "20. Juli 2025",        // Datum
-  time: "15:00 Uhr",            // Uhrzeit
-  location: "Musterstraße 123, 1010 Wien" // Ort
+  childName: "Oskar",
+  date: "25. Juni 2025",
+  time: "14:00 Uhr",
+  time_end: "ca. 17:00 Uhr",
+  location: "Waldspielplatz"
 };
 /***************************************************/
 
 document.getElementById("childName").textContent = INVITATION.childName;
 document.getElementById("date").textContent = INVITATION.date;
 document.getElementById("time").textContent = INVITATION.time;
+document.getElementById("time_end").textContent = INVITATION.time_end;
 document.getElementById("location").textContent = INVITATION.location;
 
 // Drei Scheiben: 3 = größte, 1 = kleinste
@@ -76,6 +81,7 @@ const pegs = [
 let selectedPeg = null;
 const boardEl = document.getElementById("board");
 const msgEl = document.getElementById("message");
+const videoEl = document.getElementById("victoryVideo");
 
 function render(){
   for(let i=0;i<3;i++){
@@ -120,6 +126,13 @@ function handlePegClick(index){
       render();
       if(checkWin()){
         document.getElementById("invitation").classList.remove("hidden");
+        videoEl.classList.remove("hidden");
+        videoEl.currentTime = 0;
+        videoEl.muted = false; // Ton erlauben
+        // Einige Browser blocken Autoplay mit Ton – wir versuchen es trotzdem
+        videoEl.play().catch(() => {
+          // Falls Autoplay blockiert, zeigt der User die Controls zum Starten
+        });
         setMessage("Geschafft! 🎉 Einladung freigeschaltet.");
         boardEl.querySelectorAll(".peg").forEach(p=>p.style.cursor="default");
       }else{
