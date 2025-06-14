@@ -24,8 +24,8 @@ h1{margin-bottom:1rem;}
 .disk[data-size="2"]{width:90px;background:var(--disk2);} 
 .disk[data-size="3"]{width:120px;background:var(--disk3);} 
 #message{margin-top:1.5rem;font-size:1.2rem;min-height:1.2em;}
-.hidden{display:none;}
-video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.15);display:block;}
+.hidden{display:none !important;}
+video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.15);}
 .invitation{margin-top:2rem;padding:1.5rem;border-radius:12px;background:#fff;box-shadow:0 4px 8px rgba(0,0,0,0.1);}  
 </style>
 </head>
@@ -41,8 +41,8 @@ video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shad
 
 <div id="message"></div>
 
-<!-- Video direkt unter dem Turm.  -->
-<video id="victoryVideo" class="hidden" src="oskar.mp4" playsinline controls></video>
+<!-- Video direkt unter dem Turm -->
+<video id="victoryVideo" class="hidden" src="oskar.mp4" playsinline controls preload="auto"></video>
 
 <!-- Einladungstext erscheint UNTER dem Video -->
 <div id="invitation" class="invitation hidden">
@@ -78,6 +78,14 @@ const boardEl = document.getElementById("board");
 const msgEl   = document.getElementById("message");
 const videoEl = document.getElementById("victoryVideo");
 const inviteEl= document.getElementById("invitation");
+
+//  >>> Loop-Logik – letzte 2 Sekunden <<<
+videoEl.addEventListener('ended',()=>{
+  if(videoEl.duration>2){
+    videoEl.currentTime = videoEl.duration - 2;
+    videoEl.play();
+  }
+});
 
 function render(){
   for(let i=0;i<3;i++){
