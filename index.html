@@ -8,7 +8,7 @@
 <style>
 :root{
   --mast-width:14px;
-  --mast-height:260px;
+  --mast-height:270px;   /* etwas länger für größeres Schiff */
   --disk-height:38px;
   --wood:#5b3a18;
   --parchment:#f1e7d0;
@@ -22,19 +22,20 @@ body{
 }
 h1{margin:0 0 1rem;font-size:2.3rem;letter-spacing:1px;}
 
-/* Größeres Schiff */
+/* ––– Größeres Schiff ––– */
 #ship{
   background:url('ship.png') center bottom/contain no-repeat;
-  height:320px;              /* vorher 220px */
-  max-width:900px;
+  height:440px;              /* vorher 320px */
+  max-width:1100px;
   margin:0 auto;
   position:relative;
   pointer-events:none;
 }
-/* Board sitzt leicht höher – 60 px oberhalb des Rumpfbodens */
+/* Board näher zusammen & etwas höher */
 #board{
-  position:absolute;left:0;right:0;bottom:60px;
-  display:flex;justify-content:space-around;
+  position:absolute;left:0;right:0;bottom:90px;   /* mehr Abstand zum Rumpfboden */
+  display:flex;justify-content:center;             /* zentriert */
+  column-gap:120px;                                /* enger zusammen */
   max-width:900px;margin:0 auto;
   pointer-events:auto;
 }
@@ -94,11 +95,11 @@ video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shad
 
 <script>
 const INVITATION={
-  transport:"Wir holen die Kinder um 15:00 direkt von der Schule ab und fahren mit ihnen zum Roten Berg.",
+  transport:"Wir holen dich um 15:00 direkt von der Schule ab und fahren mit dir zum Roten Berg.",
   date:"25. Juni 2025",
   time:"15:00 Uhr",
   time_end:"ca. 18:00 Uhr",
-  location:"Roter Berg"
+  location:"Roter Berg"
 };
 ["transport","date","time","time_end","location"].forEach(id=>{
   document.getElementById(id).textContent=INVITATION[id];
@@ -115,7 +116,7 @@ function valid(f,t){return pegs[f].length&&(!pegs[t].length||pegs[f].at(-1)<pegs
 function move(f,t){pegs[t].push(pegs[f].pop());}
 function win(){return pegs[2].length===3;}
 function victory(){vid.classList.remove("hidden");vid.currentTime=0;vid.muted=false;vid.play().catch(()=>{});invite.classList.remove("hidden");msg.textContent="Arrr! Schatzkarte freigeschaltet.";board.querySelectorAll(".peg").forEach(p=>p.style.cursor="default");}
-function click(i){if(selected===null){if(!pegs[i].length){msg.textContent="Kein Segel am Mast.";return;}selected=i;msg.textContent=`Segel von Mast ${i+1} gewählt – Zielmast antippen.`;}else{if(selected===i){selected=null;msg.textContent="Auswahl aufgehoben.";return;}if(valid(selected,i)){move(selected,i);render();win()?victory():msg.textContent=`Segel gesetzt von Mast ${selected+1} ➜ ${i+1}.`;}
+function click(i){if(selected===null){if(!pegs[i].length){msg.textContent="Kein Segel am Mast.";return;}selected=i;msg.textContent=`Segel von Mast ${i+1} gewählt – Zielmast antippen.`;}else{if(selected===i){selected=null;msg.textContent="Auswahl aufgehoben.";return;}if(valid(selected,i)){move(selected,i);render();win()?victory():msg.textContent=`Segel gesetzt von Mast ${selected+1} ➜ ${i+1}.`;}
  else{msg.textContent="Das geht nicht – größeres Segel unten!";}selected=null;}}
 board.querySelectorAll(".peg").forEach((p,i)=>p.addEventListener("click",()=>click(i)));
 render();
