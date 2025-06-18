@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSKARS GEBURTSTAGSRÄTSELEINLADUNG</title>
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mast-width:14px;
+  --mast-height:270px;
+  --disk-height:38px;
+  --wood:#5b3a18;
+  --parchment:#f1e7d0;
+  --sail:#fffbe6;
+  --sail-border:#c9c2a6;
+  --invite-bg:#fff5d6;
+  --invite-border:#d4ac0d;
+}
+html{font-size:clamp(17px,4.5vw,22px);}  
+body{
+  font-family:'Pirata One',cursive;
+  background:var(--parchment) url('https://cdn.jsdelivr.net/gh/tylermguyen/stock@main/parchment.jpg') repeat;
+  margin:0;padding:2rem;text-align:center;color:#321;
+}
+h1{margin:0 0 1rem;font-size:2rem;letter-spacing:1px;}
+
+#ship{position:relative;height:460px;max-width:1100px;margin:60px auto 0;pointer-events:none;}
+.ship-img{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1000px;height:auto;pointer-events:none;}
+#board{position:absolute;left:0;right:0;bottom:200px;display:flex;justify-content:center;column-gap:110px;pointer-events:auto;}
+
+.peg{position:relative;width:var(--mast-width);height:var(--mast-height);background:var(--wood);border-radius:3px;display:flex;flex-direction:column-reverse;align-items:center;gap:4px;cursor:pointer;user-select:none;}
+.peg::after{content:'🏴\200D☠️';position:absolute;top:-2rem;left:50%;transform:translateX(-50%);font-size:1.3rem;pointer-events:none;}
+.disk{height:var(--disk-height);background:var(--sail);border:3px solid var(--sail-border);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:bold;box-shadow:inset 0 0 4px #0003;width:55px;}
+.disk[data-size="2"]{width:80px;}
+.disk[data-size="3"]{width:100px;}
+
+#message{margin-top:1.2rem;font-size:1.1rem;min-height:1.3em;}
+.hidden{display:none !important;}
+video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.15);display:block;}
+.invitation{margin-top:2rem;padding:1.5rem 1.2rem;border-radius:16px;background:var(--invite-bg);border:4px solid var(--invite-border);box-shadow:0 6px 16px rgba(0,0,0,0.25);max-width:600px;margin-left:auto;margin-right:auto;font-size:1rem;}
+.invitation h2{margin-top:0;margin-bottom:0.8rem;font-size:1.4rem;}
+
+/* Video-Sprachwahl Overlay */
+#videoChoice{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999;}
+#choiceBox{background:#fffbe6;padding:2rem 1.5rem;border:4px solid #d4ac0d;border-radius:16px;box-shadow:0 4px 12px rgba(0,0,0,.4);max-width:90%;text-align:center;}
+.choiceBtn{margin:0.5rem 0.8rem;padding:0.6rem 1.2rem;border:none;border-radius:8px;background:#5b3a18;color:#fff;font-size:1rem;cursor:pointer;transition:transform .1s;}
+.choiceBtn:hover{transform:scale(1.05);} 
+
+@media(max-width:600px){
+  #ship{margin-top:20px;}
+  #board{bottom:85px;column-gap:70px;}
+  .peg{--mast-height:200px;}
+  h1{font-size:1.7rem;}
+  .choiceBtn{font-size:0.9rem;}
+}
+
+/* Klarere Lesbarkeit für Anweisungen */
+p,#message,#choiceBox p{font-family:Arial,Helvetica,sans-serif;line-height:1.4;}
+</style>
+</head>
+<body>
+<h1>⚓ OSKARS PIRATEN‑RÄTSEL‑EINLADUNG 🏴‍☠️</h1>
+<p>Um die Einladung freizuschalten, bringe das kleine Segel (<strong>Fock</strong>), das mittlere Segel (<strong>Groß</strong>) und das Riesen-Segel (<strong>Besan</strong>) vom ganz linken auf den rechten Mast – du darfst immer nur ein Segel (bei mehreren: das oberste) bewegen und nie ein größeres über ein kleineres Segel! Klicke dazu auf das Segel und dann auf den Mast, auf dem du das Segel hissen willst!</p>
+
+<div id="ship">
+  <img src="ship2.png" alt="Piratenschiff" class="ship-img" />
+  <div id="board">
+    <div class="peg" id="peg0"></div>
+    <div class="peg" id="peg1"></div>
+    <div class="peg" id="peg2"></div>
+  </div>
+</div>
+
+<div id="message"></div>
+
+<video id="victoryVideo" class="hidden" playsinline controls preload="auto"></video>
+
+<div id="invitation" class="invitation hidden">
+  <h2>🎉 Piraten‑Geburtstag 🎉</h2>
+  <p><strong>Wie:</strong> <span id="transport"></span></p>
+  <p><strong>Wann:</strong> <span id="date"></span> von <span id="time"></span> bis <span id="time_end"></span></p>
+  <p><strong>Wo:</strong> <span id="location"></span></p>
+  <p>Sag Bescheid, ob du an Bord kommst! 🏴‍☠️</p>
+</div>
+
+<!-- Sprachwahl-Overlay -->
+<div id="videoChoice" class="hidden">
+  <div id="choiceBox">
+    <p style="margin-top:0">Aye Pirat, willst du ein deutsches oder englisches Video sehen?</p>
+    <button class="choiceBtn" onclick="chooseVideo('Affe_Deutsch.mp4')">Deutsch 🇩🇪</button>
+    <button class="choiceBtn" onclick="chooseVideo('Pirate_ape_Englisch.mp4')">Englisch 🇬🇧</button>
+  </div>
+</div>
+
+<script>
+/********* Daten *********/
+const INVITATION={transport:"Wir holen dich um 15:00 direkt von der Schule ab und segeln mit dir zum Roten Berg.",date:"25. Juni 2025",time:"15:00 Uhr",time_end:"ca. 18:00 Uhr",location:"Roter Berg"};
+["transport","date","time","time_end","location"].forEach(id=>document.getElementById(id).textContent=INVITATION[id]);
+
+/********* Spiel‑Setup *********/
+const SAIL_NAMES={1:"Fock",2:"Groß",3:"Besan"};
+const pegs=[[3,2,1],[],[]]; // Startzustand
+let sel=null, selectedVideo="";
+
+/********* DOM Elemente *********/
+const msg=document.getElementById("message");
+const vid=document.getElementById("victoryVideo");
+const invite=document.getElementById("invitation");
+const choice=document.getElementById("videoChoice");
+
+/********* Rendering *********/
+function render(){
+  for(let i=0;i<3;i++){
+    const peg=document.getElementById(`peg${i}`);
+    peg.innerHTML="";
+    pegs[i].forEach(size=>{
+      const d=document.createElement("div");
+      d.className="disk";
+      d.dataset.size=size;
+      d.textContent=SAIL_NAMES[size];
+      peg.appendChild(d);
+    });
+  }
+}
+
+/********* Spiellogik *********/
+const valid=(f,t)=>pegs[f].length&&(!pegs[t].length||pegs[f][pegs[f].length-1]<pegs[t][pegs[t].length-1]);
+const move=(f,t)=>pegs[t].push(pegs[f].pop());
+const win=()=>pegs[2].length===3;
+
+function chooseVideo(file){
+  selectedVideo=file;
+  choice.classList.add("hidden");
+  playVideo();
+}
+function playVideo(){
+  vid.src = selectedVideo;
+  vid.classList.remove("hidden");
+  vid.currentTime = 0;
+  vid.muted = false;
+  vid.play().catch(()=>{});
+
+  vid.onended = () => {
+    invite.classList.remove("hidden");   // Einladung zeigen
+    selectedVideo = "";                  // Wahl zurücksetzen  ← NEU
+  };
+}
+
+function victory(){
+  msg.textContent="Arrr! Schatzkarte freigeschaltet.";
+  if(selectedVideo){playVideo();}else{choice.classList.remove("hidden");}
+  document.querySelectorAll(".peg").forEach(p=>p.style.cursor="default");
+}
+
+function handleClick(i){
+  if(sel===null){
+    // Erstes Antippen – Ausgangsmast wählen
+    if(!pegs[i].length){
+      msg.textContent = "Kein Segel am Mast.";
+      return;
+    }
+    sel = i;
+    msg.textContent = `${SAIL_NAMES[pegs[i].at(-1)]} gewählt – Zielmast antippen.`;
+  }else{
+    // Zweites Antippen – Zielmast
+    if(sel === i){
+      sel = null;
+      msg.textContent = "Auswahl aufgehoben.";
+      return;
+    }
+    if(valid(sel,i)){
+      move(sel,i);
+      render();
+      if(win()){
+        victory();
+      }else{
+        msg.textContent = `${SAIL_NAMES[pegs[i].at(-1)]} gesetzt.`;
+      }
+    }else{
+      msg.textContent = "Das geht nicht – größeres Segel unten!";
+    }
+    sel = null;
+  }
+}
+
+/* Peg-Listener aktivieren */
+document.querySelectorAll(".peg").forEach((peg,idx)=>
+  peg.addEventListener("click", ()=>handleClick(idx))
+);
+
+/* Erstmaliges Zeichnen */
+render();
+</script>
+
