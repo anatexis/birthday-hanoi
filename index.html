@@ -24,8 +24,7 @@ h1{margin:0 0 1rem;font-size:2.3rem;letter-spacing:1px;}
 
 /* Schiff-Container */
 #ship{position:relative;height:460px;max-width:1100px;margin:0 auto;pointer-events:none;}
-/* Neues detailreicheres SVG – bleibt klein (<6 KB) */
-.ship-svg{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1000px;height:auto;fill:#000;pointer-events:none;}
+.ship-img{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1000px;height:auto;pointer-events:none;}
 
 #board{position:absolute;left:0;right:0;bottom:110px;display:flex;justify-content:center;column-gap:110px;pointer-events:auto;}
 .peg{position:relative;width:var(--mast-width);height:var(--mast-height);background:var(--wood);border-radius:3px;display:flex;flex-direction:column-reverse;align-items:center;gap:4px;cursor:pointer;user-select:none;}
@@ -44,28 +43,8 @@ video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shad
 <p>Bringe die drei Segel von der linken auf die rechte Mastspitze – immer nur ein Segel und nie ein größeres über ein kleineres.</p>
 
 <div id="ship">
-  <!-- detaillierter Piratenschiffs‑SVG‑Rumpf  -->
-  <svg class="ship-svg" viewBox="0 0 1200 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    <!-- Hull -->
-    <path d="M50 220 Q180 120 350 120 L850 120 Q1020 120 1150 220 L1150 260 L50 260 Z"/>
-    <!-- Cut‑water (Bow) -->
-    <path d="M50 220 Q20 210 20 245 T50 260 Z"/>
-    <!-- Sterncastle -->
-    <path d="M950 120 L1000 70 L1070 70 L1100 120 Z"/>
-    <!-- Gunports -->
-    <g>
-      <rect x="420" y="155" width="32" height="24"/>
-      <rect x="470" y="155" width="32" height="24"/>
-      <rect x="520" y="155" width="32" height="24"/>
-      <rect x="570" y="155" width="32" height="24"/>
-      <rect x="620" y="155" width="32" height="24"/>
-    </g>
-    <!-- Figurehead flag at stern -->
-    <g transform="translate(1030 30)">
-      <rect x="0" y="0" width="12" height="80"/>
-      <path d="M12 5 L90 5 L60 30 L90 55 L12 55 Z"/>
-    </g>
-  </svg>
+  <!-- Externes SVG (dein eigenes Schiff) -->
+  <img src="ship.svg" alt="Piratenschiff" class="ship-img" />
 
   <div id="board">
     <div class="peg" id="peg0"></div>
