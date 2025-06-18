@@ -4,53 +4,91 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OSKARS GEBURTSTAGSRÄTSELEINLADUNG</title>
+<!-- Google‑Font für Piraten‑Look -->
+<link href="https://fonts.googleapis.com/css2?family=Pirata+One&display=swap" rel="stylesheet">
 <style>
+/************  Farb‑ & Layout‑Variablen  ************/
 :root{
-  --peg-width:120px;
-  --peg-height:250px;
-  --disk-height:30px;
-  --bg:#fefae0;
-  --peg-color:#dda15e;
-  --disk1:#283618;
-  --disk2:#606c38;
-  --disk3:#bc6c25;
+  --mast-width:14px;           /* Peg‑Breite = Mast */
+  --mast-height:250px;
+  --disk-height:36px;          /* „Segel“ */
+  --wood:#5b3a18;              /* Mastfarbe */
+  --parchment:#f1e7d0;         /* Seitenhintergrund */
+  --sail:#fffbe6;              /* Segelstoff */
+  --sail-border:#c9c2a6;
 }
-body{font-family:Helvetica,Arial,sans-serif;background:var(--bg);margin:0;padding:2rem;text-align:center;color:#333;}
-h1{margin-bottom:1rem;}
-#board{display:flex;justify-content:space-around;max-width:800px;margin:0 auto;}
-.peg{position:relative;width:var(--peg-width);height:var(--peg-height);border:3px solid var(--peg-color);border-radius:10px;display:flex;flex-direction:column-reverse;align-items:center;gap:2px;padding:4px;cursor:pointer;user-select:none;}
-.disk{height:var(--disk-height);border-radius:6px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:bold;}
-.disk[data-size="1"]{width:60px;background:var(--disk1);} 
-.disk[data-size="2"]{width:90px;background:var(--disk2);} 
-.disk[data-size="3"]{width:120px;background:var(--disk3);} 
-#message{margin-top:1.5rem;font-size:1.2rem;min-height:1.2em;}
+/************  Grundlayout  ************/
+body{
+  font-family:'Pirata One', cursive;
+  background:var(--parchment) url('https://cdn.jsdelivr.net/gh/tylermguyen/stock@main/parchment.jpg') repeat; /* CC‑0 Textur */
+  margin:0;padding:2rem;text-align:center;color:#321;
+}
+h1{margin:0 0 1rem;font-size:2.2rem;letter-spacing:1px;}
+#ship{ /* Schiffs‑Rumpf als dekorativer Container */
+  background:url('ship.png') center bottom / contain no-repeat;
+  height:220px;max-width:800px;margin:0 auto;position:relative;pointer-events:none;
+}
+#board{display:flex;justify-content:space-around;max-width:800px;margin:0 auto;pointer-events:auto;}
+
+/************  Pegs → Masten  ************/
+.peg{
+  position:relative;
+  width:var(--mast-width);
+  height:var(--mast-height);
+  background:var(--wood);
+  display:flex;flex-direction:column-reverse;align-items:center;gap:4px;cursor:pointer;user-select:none;
+  border-radius:3px;
+}
+/* Kleine Piratenflagge */
+.peg::after{
+  content:'🏴\200D☠️';
+  position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+  font-size:1.5rem;pointer-events:none;
+}
+
+/************  Disks → Segel  ************/
+.disk{
+  height:var(--disk-height);
+  background:var(--sail);
+  border:3px solid var(--sail-border);
+  border-radius:8px;
+  width:60px;display:flex;align-items:center;justify-content:center;color:#555;font-weight:bold;
+  box-shadow:inset 0 0 4px #0003;
+}
+.disk[data-size="2"]{width:90px;}
+.disk[data-size="3"]{width:120px;}
+
+/************  Sonstiges  ************/
+#message{margin-top:1.2rem;font-size:1.3rem;min-height:1.3em;}
 .hidden{display:none !important;}
-video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.15);}
-.invitation{margin-top:2rem;padding:1.5rem;border-radius:12px;background:#fff;box-shadow:0 4px 8px rgba(0,0,0,0.1);}  
+video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,0.15);display:block;}
+.invitation{margin-top:2rem;padding:1.2rem;border-radius:12px;background:#fff8e9;box-shadow:0 4px 8px rgba(0,0,0,0.1);}
 </style>
 </head>
 <body>
-<h1>OSKARS GEBURTSTAGSRÄTSELEINLADUNG</h1>
-<p>Bewege die drei Scheiben vom linken auf den rechten Pfosten – immer nur eine Scheibe und nie eine größere auf eine kleinere.</p>
+<h1>⚓ OSKARS PIRATEN‑RÄTSEL‑EINLADUNG 🏴‍☠️</h1>
+<p>Bringe die drei Segel von der linken auf die rechte Mastspitze – immer nur ein Segel und nie ein größeres über ein kleineres.</p>
 
-<div id="board">
-  <div class="peg" id="peg0"></div>
-  <div class="peg" id="peg1"></div>
-  <div class="peg" id="peg2"></div>
+<div id="ship">
+  <div id="board">
+    <div class="peg" id="peg0"></div>
+    <div class="peg" id="peg1"></div>
+    <div class="peg" id="peg2"></div>
+  </div>
 </div>
 
 <div id="message"></div>
 
-<!-- Video direkt unter dem Turm -->
+<!-- Video direkt unter dem Schiff -->
 <video id="victoryVideo" class="hidden" src="oskar.mp4" playsinline controls preload="auto"></video>
 
-<!-- Einladungstext erscheint UNTER dem Video -->
+<!-- Einladungstext erscheint unter dem Video -->
 <div id="invitation" class="invitation hidden">
-  <h2>🎉 Geburtstagseinladung 🎉</h2>
-  <p><strong>Wer:</strong> <span id="childName"></span></p>
+  <h2>🎉 Piraten‑Geburtstag 🎉</h2>
+  <p><strong>Wie:</strong> <span id="transport"></span></p>
   <p><strong>Wann:</strong> <span id="date"></span> von <span id="time"></span> bis <span id="time_end"></span></p>
   <p><strong>Wo:</strong> <span id="location"></span></p>
-  <p>Wir freuen uns auf dich! Bitte gib Bescheid, ob du kommen kannst.</p>
+  <p>Sag Bescheid, ob du an Bord kommst! 🏴‍☠️</p>
 </div>
 
 <script>
@@ -58,20 +96,20 @@ video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shad
  *  KONFIGURATION     *
  **********************/
 const INVITATION = {
-  childName: "Oskar",
+  transport: "Wir holen die Kinder um 15:00 direkt von der Schule ab und fahren mit ihnen zum Roten Berg. ",
   date: "25. Juni 2025",
-  time: "14:00 Uhr",
-  time_end: "ca. 17:00 Uhr",
-  location: "Waldspielplatz"
+  time: "15:00 Uhr",
+  time_end: "ca. 18:00 Uhr",
+  location: "Roter Berg"
 };
 /***************************************************/
 
-// Textfelder befüllen
-["childName","date","time","time_end","location"].forEach(id=>{
+// Plätze befüllen
+["transport","date","time","time_end","location"].forEach(id=>{
   document.getElementById(id).textContent = INVITATION[id];
 });
 
-// Drei Scheiben (3 = groß, 1 = klein)
+// Drei Segel (3 = größtes)
 const pegs = [[3,2,1],[],[]];
 let selectedPeg = null;
 const boardEl = document.getElementById("board");
@@ -79,7 +117,7 @@ const msgEl   = document.getElementById("message");
 const videoEl = document.getElementById("victoryVideo");
 const inviteEl= document.getElementById("invitation");
 
-//  >>> Loop-Logik – letzte 2 Sekunden <<<
+// Loop nur letzte 2 s
 videoEl.addEventListener('ended',()=>{
   if(videoEl.duration>2){
     videoEl.currentTime = videoEl.duration - 2;
@@ -112,18 +150,19 @@ function victory(){
   videoEl.muted=false;
   videoEl.play().catch(()=>{});
   inviteEl.classList.remove("hidden");
-  setMessage("Geschafft! 🎉 Einladung freigeschaltet.");
+  setMessage("Arrr! Schatzkarte freigeschaltet. 🏴‍☠️");
   boardEl.querySelectorAll(".peg").forEach(p=>p.style.cursor="default");
 }
 
 function handlePegClick(i){
   if(selectedPeg===null){
-    if(!pegs[i].length){ setMessage("Da ist keine Scheibe."); return; }
-    selectedPeg=i; setMessage(`Scheibe von Stange ${i+1} ausgewählt. Ziel wählen.`);
+    if(!pegs[i].length){ setMessage("Kein Segel am Mast."); return; }
+    selectedPeg=i; setMessage(`Segel von Mast ${i+1} gewählt – Zielmast antippen.`);
   }else{
     if(selectedPeg===i){ selectedPeg=null; setMessage("Auswahl aufgehoben."); return; }
-    if(isValidMove(selectedPeg,i)){ moveDisk(selectedPeg,i); render(); checkWin()?victory():setMessage(`Scheibe verschoben von ${selectedPeg+1} zu ${i+1}.`);
-    }else{ setMessage("Ungültiger Zug."); }
+    if(isValidMove(selectedPeg,i)){
+      moveDisk(selectedPeg,i); render(); checkWin()?victory():setMessage(`Segel gesetzt von Mast ${selectedPeg+1} ➜ ${i+1}.`);
+    }else{ setMessage("Das geht nicht – größeres Segel unten!"); }
     selectedPeg=null;
   }
 }
@@ -134,4 +173,3 @@ render();
 </script>
 </body>
 </html>
-
