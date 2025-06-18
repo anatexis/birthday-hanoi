@@ -17,7 +17,7 @@
   --invite-bg:#fff5d6;
   --invite-border:#d4ac0d;
 }
-/* Basis‑Typografie – skaliert adaptiv (clamp) für bessere Lesbarkeit auf Mobil‑Geräten */
+/* Basis-Typografie – skaliert adaptiv (clamp) für bessere Lesbarkeit auf Mobil-Geräten */
 html{font-size:clamp(17px,4.5vw,22px);}  
 body{
   font-family:'Pirata One',cursive;
@@ -27,9 +27,22 @@ body{
 h1{margin:0 0 1rem;font-size:2rem;letter-spacing:1px;}
 
 /* Schiff + Board */
-#ship{position:relative;height:460px;max-width:1100px;margin:0 auto;pointer-events:none;}
-.ship-img{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:1000px;height:auto;pointer-events:none;}
-#board{position:absolute;left:0;right:0;bottom:200px;display:flex;justify-content:center;column-gap:100px;pointer-events:auto;}
+#ship{
+  position:relative;
+  height:460px;
+  max-width:1100px;
+  margin:60px auto 0;           /* 60 px Abstand zur Überschrift */
+  pointer-events:none;
+}
+.ship-img{
+  position:absolute;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:1000px;height:auto;pointer-events:none;
+}
+#board{
+  position:absolute;left:0;right:0;bottom:200px;
+  display:flex;justify-content:center;column-gap:100px;
+  pointer-events:auto;
+}
 
 /* Masten & Segel */
 .peg{position:relative;width:var(--mast-width);height:var(--mast-height);background:var(--wood);border-radius:3px;display:flex;flex-direction:column-reverse;align-items:center;gap:4px;cursor:pointer;user-select:none;}
@@ -57,15 +70,16 @@ video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shad
 
 /* Mobile Feintuning */
 @media(max-width:600px){
-  #board{column-gap:60px;}
+  #ship{margin-top:20px;}             /* Schiff wieder näher an Masten */
+  #board{bottom:150px;column-gap:60px;}
   .peg{--mast-height:200px;}
   h1{font-size:1.7rem;}
 }
 </style>
 </head>
 <body>
-<h1>⚓ OSKARS PIRATEN‑RÄTSEL‑EINLADUNG 🏴‍☠️</h1>
-<p>Bringe die drei Segel von der linken auf die rechte Mastspitze – immer nur ein Segel und nie ein größeres über ein kleineres.</p>
+<h1>⚓ OSKARS PIRATEN-RÄTSEL-EINLADUNG 🏴‍☠️</h1>
+<p>Bringe die drei Segel von der linken auf die rechte Mastspitze – immer nur ein Segel und nie ein größeres über ein kleineres.</p>
 
 <div id="ship">
   <img src="ship2.png" alt="Piratenschiff" class="ship-img" />
@@ -81,18 +95,18 @@ video#victoryVideo{margin:2rem auto 0;max-width:100%;border-radius:12px;box-shad
 <video id="victoryVideo" class="hidden" src="oskar.mp4" playsinline controls preload="auto"></video>
 
 <div id="invitation" class="invitation hidden">
-  <h2>🎉 Piraten‑Geburtstag 🎉</h2>
+  <h2>🎉 Piraten-Geburtstag 🎉</h2>
   <p><strong>Wie:</strong> <span id="transport"></span></p>
   <p><strong>Wann:</strong> <span id="date"></span> von <span id="time"></span> bis <span id="time_end"></span></p>
   <p><strong>Wo:</strong> <span id="location"></span></p>
-  <p>Sag Bescheid, ob du an Bord kommst! 🏴‍☠️</p>
+  <p>Sag Bescheid, ob du an Bord kommst! 🏴‍☠️</p>
 </div>
 
 <script>
 /* ---------- Daten ---------- */
 const INVITATION={
   transport:"Wir holen dich um 15:00 direkt von der Schule ab und fahren mit dir zum Roten Berg.",
-  date:"25. Juni 2025",time:"15:00 Uhr",time_end:"ca. 18:00 Uhr",location:"Roter Berg"
+  date:"25. Juni 2025",time:"15:00 Uhr",time_end:"ca. 18:00 Uhr",location:"Roter Berg"
 };
 ["transport","date","time","time_end","location"].forEach(id=>document.getElementById(id).textContent=INVITATION[id]);
 
@@ -123,13 +137,13 @@ function victory(){
 function click(i){
   if(sel===null){
     if(!pegs[i].length){msg.textContent="Kein Segel am Mast.";return;}
-    sel=i;msg.textContent=`Segel von Mast ${i+1} gewählt – Zielmast antippen.`;
+    sel=i;msg.textContent=`Segel von Mast ${i+1} gewählt – Zielmast antippen.`;
   }else{
     if(sel===i){sel=null;msg.textContent="Auswahl aufgehoben.";return;}
     if(valid(sel,i)){
       move(sel,i);render();
       win()?victory():msg.textContent=`Segel gesetzt von Mast ${sel+1} ➜ ${i+1}.`;
-    }else{msg.textContent="Das geht nicht – größeres Segel unten!";}
+    }else{msg.textContent="Das geht nicht – größeres Segel unten!";}
     sel=null;
   }
 }
@@ -138,4 +152,3 @@ render();
 </script>
 </body>
 </html>
-
