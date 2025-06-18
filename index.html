@@ -135,13 +135,18 @@ function chooseVideo(file){
   playVideo();
 }
 function playVideo(){
-  vid.src=selectedVideo;
+  vid.src = selectedVideo;
   vid.classList.remove("hidden");
-  vid.currentTime=0;
-  vid.muted=false;
+  vid.currentTime = 0;
+  vid.muted = false;
   vid.play().catch(()=>{});
-  vid.onended=()=>invite.classList.remove("hidden");
+
+  vid.onended = () => {
+    invite.classList.remove("hidden");   // Einladung zeigen
+    selectedVideo = "";                  // Wahl zurücksetzen  ← NEU
+  };
 }
+
 function victory(){
   msg.textContent="Arrr! Schatzkarte freigeschaltet.";
   if(selectedVideo){playVideo();}else{choice.classList.remove("hidden");}
